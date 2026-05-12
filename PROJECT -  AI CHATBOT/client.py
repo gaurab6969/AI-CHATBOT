@@ -27,7 +27,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 def read_chat_history(args: argparse.Namespace) -> str:
     if args.chat_file:
-        return Path(args.chat_file).read_text(encoding="utf-8")
+        path = Path(args.chat_file)
+        try:
+            return path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            return path.read_text(encoding="utf-16")
     if args.chat_history:
         return args.chat_history
     if not sys.stdin.isatty():

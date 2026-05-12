@@ -16,7 +16,7 @@ from coordinates import (
     Point,
 )
 
-DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
 DEFAULT_SENDER_NAME = os.getenv("CHATBOT_SENDER_NAME", "Gaurav")
 
 SYSTEM_PROMPT = (
@@ -142,24 +142,16 @@ def create_genai_client(api_key: Optional[str] = None):
     api_key = api_key or os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError(
-            "Missing Gemini API key. Set the GEMINI_API_KEY environment variable first."
+            "Error: Gemini API key is missing. Please set the GEMINI_API_KEY environment variable or provide it via the --api-key argument."
         )
 
     try:
-        # Preferred import path (google-genai)
-        from google import genai  # type: ignore
-        from google.genai import types  # type: ignore
-    except ImportError:
-        # Fallback import path in case the package exposes a different top-level module name
-        try:
-            import google_genai as genai  # type: ignore
-            from google_genai import types  # type: ignore
-        except ImportError as exc:
-            raise RuntimeError(
-                "Missing dependency: install `google-genai`.\n"
-                "Try: pip install google-genai\n"
-                "Then re-run this script."
-            ) from exc
+        from google import genai
+        from google.genai import types
+    except ImportError as exc:
+        raise RuntimeError(
+            "Error: The 'google-genai' package is not installed. Please install it using 'pip install google-genai'."
+        ) from exc
 
     return genai.Client(api_key=api_key), types
 
